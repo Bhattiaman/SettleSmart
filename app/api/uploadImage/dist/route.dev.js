@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.POST = POST;
+exports.GET = GET;
 exports.config = void 0;
 
 var _server = require("next/server");
@@ -22,27 +23,26 @@ var config = {
 exports.config = config;
 
 function POST(req) {
-  var formData, email, image, file, imageBuffer, fileBuffer, updatedData, result;
+  var formData, email, image, file, imageBuffer, fileBuffer, newEntry;
   return regeneratorRuntime.async(function POST$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _context.prev = 0;
-          _context.next = 3;
+          _context.next = 2;
           return regeneratorRuntime.awrap((0, _page2["default"])());
 
-        case 3:
-          _context.next = 5;
+        case 2:
+          _context.next = 4;
           return regeneratorRuntime.awrap(req.formData());
 
-        case 5:
+        case 4:
           formData = _context.sent;
           email = formData.get("email");
           image = formData.get("image");
           file = formData.get("file");
 
           if (!(!email || !image || !file)) {
-            _context.next = 11;
+            _context.next = 10;
             break;
           }
 
@@ -51,22 +51,22 @@ function POST(req) {
             message: "Email, image, and file are required!"
           }));
 
-        case 11:
+        case 10:
           _context.t0 = Buffer;
-          _context.next = 14;
+          _context.next = 13;
           return regeneratorRuntime.awrap(image.arrayBuffer());
 
-        case 14:
+        case 13:
           _context.t1 = _context.sent;
           imageBuffer = _context.t0.from.call(_context.t0, _context.t1);
           _context.t2 = Buffer;
-          _context.next = 19;
+          _context.next = 18;
           return regeneratorRuntime.awrap(file.arrayBuffer());
 
-        case 19:
+        case 18:
           _context.t3 = _context.sent;
           fileBuffer = _context.t2.from.call(_context.t2, _context.t3);
-          updatedData = {
+          newEntry = new _page.FileModel({
             email: email,
             image: {
               filename: image.name,
@@ -78,36 +78,47 @@ function POST(req) {
               contentType: file.type,
               fileBase64: fileBuffer.toString("base64")
             }
-          };
-          _context.next = 24;
-          return regeneratorRuntime.awrap(_page.FileModel.findOneAndUpdate({
-            email: email
-          }, updatedData, {
-            upsert: true,
-            "new": true
+          });
+          _context.next = 23;
+          return regeneratorRuntime.awrap(newEntry.save());
+
+        case 23:
+          return _context.abrupt("return", _server.NextResponse.json({
+            success: true,
+            message: "Uploaded successfully"
           }));
 
         case 24:
-          result = _context.sent;
-          return _context.abrupt("return", _server.NextResponse.json({
-            success: true,
-            message: result ? "Updated successfully" : "Created new entry"
-          }));
-
-        case 28:
-          _context.prev = 28;
-          _context.t4 = _context["catch"](0);
-          console.error("Upload error:", _context.t4);
-          return _context.abrupt("return", _server.NextResponse.json({
-            success: false,
-            message: "Server error",
-            error: _context.t4.message || "Unknown error"
-          }));
-
-        case 32:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 28]]);
+  });
+}
+
+function GET() {
+  var files;
+  return regeneratorRuntime.async(function GET$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          _context2.next = 2;
+          return regeneratorRuntime.awrap((0, _page2["default"])());
+
+        case 2:
+          _context2.next = 4;
+          return regeneratorRuntime.awrap(_page.FileModel.find().sort({
+            createdAt: -1
+          }));
+
+        case 4:
+          files = _context2.sent;
+          return _context2.abrupt("return", _server.NextResponse.json(files));
+
+        case 6:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  });
 }

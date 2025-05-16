@@ -15,7 +15,6 @@ const page = () => {
 
   useEffect(() => {
     const checkuser = async () => {
-
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -23,9 +22,9 @@ const page = () => {
         setLoading(false);
         return;
       }
-
+ 
       try {
-        const response = await fetch("http://localhost:3000/api/useremail", {
+        const response = await fetch( `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/useremail`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -45,8 +44,6 @@ const page = () => {
       } finally {
         setLoading(false); // ✅ set loading to false after everything
       }
-
-      
     };
 
     checkuser();
@@ -203,7 +200,7 @@ const page = () => {
     e.preventDefault(); 
   
     try {
-      const response = await fetch("http://localhost:3000/api/Facultydetails", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_URL}/api/Facultydetails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
